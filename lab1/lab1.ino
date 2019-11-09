@@ -1,28 +1,74 @@
-#include "pitches.h"
+#include <Arduino.h>
 #include "button.h"
-#include "buzzer.h"
+#include "garland.h"
+#include "state.h"
 
-#define PIN_BUZZER 6
-#define PIN_BUTTON_OFF 5
+#define CHANGE_MODE_BUTTON 13
+    
+    Button changeModeButton(CHANGE_MODE_BUTTON);
+    
+    Garland garland;
+    
+    unsigned long previousMillis = 0;
 
-Button buttonOff(PIN_BUTTON_OFF);
-Buzzer buzzer(PIN_BUZZER);
+    int modeNum = 0;
+    String states1[] = {YRO, YR_, Y__, OFF, __O, _RO};
+    int durations1[] = {500, 500, 500, 500, 500, 500};
+    int modeLength1 = 6;
+
+    String states2[] = {R__, _W_, __B};
+    int durations2[] = {50, 50, 50};
+    int modeLength2 = 3;
+
+    String states3[] = {O__, __P, _W_};
+    int durations3[] = {200, 200, 200};
+    int modeLength3 = 3;
+
+    // закидываем состоянияб длительность и кол-во состояний для каждого мода
+    String* states[] = {states1, states2, states3};
+    int* durations[] = {durations1, durations2, durations3};
+    int lengths[] = {modeLength1, modeLength2, modeLength3};
+
+    //кол-во модов
+    int modes_count = 3;
 
 
-int notes[] = {NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_DS3, NOTE_SILENCE};
-double durations[] = {8, 8, 1, 8, 1, 8, 1, 24};
-int melodyLength = 8;
+void setup()
+{
+    Serial.begin(115200);
+    Serial.println("Started!");
+    pinMode(first_R_OUT, OUTPUT);
+    pinMode(first_G_OUT, OUTPUT);
+    pinMode(first_B_OUT, OUTPUT);
 
-void setup() {
-    buzzer.setMelody(notes, durations, melodyLength);
-    buzzer.turnSoundOn();
+    pinMode(second_R_OUT, OUTPUT);
+    pinMode(second_G_OUT, OUTPUT);
+    pinMode(second_B_OUT, OUTPUT);
+
+    pinMode(third_R_OUT, OUTPUT);
+    pinMode(third_G_OUT, OUTPUT);
+    pinMode(third_B_OUT, OUTPUT);
+
+    garland.set_mode(states1, durations1, modeLength1);
 }
 
-void loop() {
-  
-    buzzer.playSound();
-    if (buttonOff.wasPressed())
+void loop() 
+{   
+    if (millis() - previousMillis >= garland.get_current_duration())
     {
-        buzzer.turnSoundOff();
+        garland.set_next_state();
+        Serial.println(String(garland.get_current_duration()));
+        previousMillis = millis();
     }
+
+    if(changeModeButton.wasPressed())
+    {
+        //Serial.println("Changed");
+        int modeIndex = modeNum % modes_count; // меняем циклически
+        garland.set_mode(states[modeIndex], durations[modeIndex], lengths[modeIndex]);
+        //Serial.println(String(modeIndex));
+        modeNum += 1;
+        delay(150);
+    }
+
 }

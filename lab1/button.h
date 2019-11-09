@@ -1,47 +1,29 @@
-#pragma once
-
-#define BUTTON_DEBOUNCE_DELAY 50
-
 class Button
 {
 public:
     Button(int _pin)
     {
         pin = _pin;
-        state = LOW;
-        debounceState = LOW;
-
-        pinMode(pin, INPUT_PULLUP);
+        pinMode(pin, INPUT);
+        pressed = false;
     }
-
     bool wasPressed()
     {
-        bool result = false;
-        int lastSeen = state;
-        readButtonWithDebounce();
+        if(!digitalRead(pin) == HIGH && pressed == 0)
+        {
+            Serial.println("true ");
+            pressed = true;
+            return true;
+        }
 
-        if (lastSeen == HIGH && state == LOW)
-            result = true;
-
-        return result;
+        if(!digitalRead(pin) == LOW && pressed == 1)
+        {
+            pressed = false;
+ 
+            Serial.println("False ");
+            return false;
+        }
     }
-
-    void readButtonWithDebounce()
-    {  
-        int current = digitalRead(pin);
-
-        if (current != debounceState)
-            debounceLastMs = millis();
-
-        if ((millis() - debounceLastMs) > BUTTON_DEBOUNCE_DELAY)
-            state = current;
-
-        debounceState = current;
-    }
-
-private:
     int pin;
-    int state;
-    int debounceState;
-    unsigned long debounceLastMs;
+    boolean pressed;    
 };
