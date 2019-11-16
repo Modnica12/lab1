@@ -1,3 +1,4 @@
+#include "RGBcolor.h"
 #define first_R_OUT 2
 #define first_G_OUT 3
 #define first_B_OUT 4
@@ -18,19 +19,15 @@ int thirdLed[] = {third_R_OUT, third_G_OUT, third_B_OUT};
 
 int* leds[] = {firstLed, secondLed, thirdLed};
 
-
-int off[] = {0, 0, 0};  
-
-
 // colors
-int colorRed[] = {255, 0, 0};
-int colorGreen[] = {0, 255, 0};
-int colorBlue[] = {0, 0, 255};
-int colorWhite[] = {255, 255, 255};
-int colorPurple[] = {170, 0, 255};
-int colorYellow[] = {255, 210, 0};
-int colorOrange[] = {240, 69, 0};
-
+RGBColor colorRed(255, 0, 0);
+RGBColor colorGreen(0, 255, 0);
+RGBColor colorBlue(0, 0, 255);
+RGBColor colorWhite(255, 255, 255);
+RGBColor colorPurple(170, 0, 255);
+RGBColor colorYellow(255, 210, 0);
+RGBColor colorOrange(240, 69, 0);
+RGBColor colorBlack(0,0,0);
 
 class Garland
 {
@@ -75,7 +72,7 @@ public:
           set_rgb_led(currentLed, colorBlue);
           break;
         case '_':
-          set_rgb_led(currentLed, off);
+          set_rgb_led(currentLed, colorBlack);
           break;
         case 'O':
           set_rgb_led(currentLed, colorOrange);
@@ -97,11 +94,11 @@ public:
        return durations[stateNumber % modeLength];
     }
       
-    void set_rgb_led(int led[], int rgb[])
+    void set_rgb_led(int led[], RGBColor rgb)
     {
-       analogWrite(led[0], 255 - rgb[0]);
-       analogWrite(led[1], 255 - rgb[1]);
-       analogWrite(led[2], 255 - rgb[2]);
+       analogWrite(led[0], 255 - rgb.r);
+       analogWrite(led[1], 255 - rgb.g);
+       analogWrite(led[2], 255 - rgb.b);
     }
 
   

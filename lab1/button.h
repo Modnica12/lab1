@@ -27,3 +27,4 @@ public:
     int pin;
     boolean pressed;    
 };
+    
